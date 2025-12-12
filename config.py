@@ -1,1 +1,3 @@
 AWS_REGION = "us-east-1"
+STOPPED_HOURS_THRESHOLD = 24
+DRY_RUN = True

@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 def scan_stopped_instances():
     try:
+        report = []
         ec2_client = boto3.client("ec2", region_name=config.AWS_REGION)
         print("Scanning for stopped EC2 instances...")
 
@@ -14,7 +15,7 @@ def scan_stopped_instances():
         stopped_instances = response["Reservations"]
         if not stopped_instances:
             print("No stopped instances found.")
-            return
+            return report
 
         for reservation in stopped_instances:
             for instance in reservation["Instances"]:
@@ -34,27 +35,34 @@ def scan_stopped_instances():
                     delta = current_time - stop_date
                     hours_stopped = delta.total_seconds() / 3600
                     if hours_stopped > config.STOPPED_HOURS_THRESHOLD:
-                        print(
-                            f"ACTION REQUIRED: Instance {instance_id} has been stopped for {hours_stopped:.2f} hours."
-                        )
-                        terminate_instance(instance_id)
+
+                        message = f"ACTION REQUIRED: Instance {instance_id} has been stopped for {hours_stopped:.2f} hours."
+                        report.append(message)
+
+                        action_message = terminate_instance(instance_id)
+                        report.append(action_message)
                 else:
                     stop_date = "N/A"
-                # print(
-                #     f"Instance ID: {instance_id}, Stop Date: {stop_date}, Current Time: {current_time}, Delta: {delta.days} days {delta.seconds // 3600} hours {delta.seconds // 60 % 60} minutes {delta.seconds % 60} seconds"
-                # )
 
     except Exception as e:
-        print(f"Error scanning instances: {e}")
+        error_message = f"Error scanning instances: {e}"
+        print(error_message)
+        report.append(error_message)
+
+    return report
 
 
 def terminate_instance(instance_id):
     try:
         ec2_client = boto3.client("ec2", region_name=config.AWS_REGION)
         if config.DRY_RUN:
-            print(f"DRY RUN: Would Terminate instance {instance_id}")
+            message = f"DRY RUN: Would Terminate instance {instance_id}"
+            print(message)
+            return message
         else:
             ec2_client.terminate_instances(InstanceIds=[instance_id])
-            print(f"Terminated instance {instance_id}")
+            message = f"Terminated instance {instance_id}"
+            print(message)
+            return message
     except Exception as e:
         print(f"Error terminating instance {instance_id}: {e}")

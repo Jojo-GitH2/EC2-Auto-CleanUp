@@ -61,10 +61,10 @@ AWS_REGION = 'us-east-1'
    cd aws-cleanup-utility
    ```
 2. **Install Dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-3. **Configure Credentials**: Ensure your AWS credentials set up locally 
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Configure Credentials**: Ensure your AWS credentials set up locally
    ```
    aws configure
    ```
@@ -72,12 +72,14 @@ AWS_REGION = 'us-east-1'
    ```bash
    python main.py
    ```
-5. **View Report:** Check the generated file (e.g. `cleanup_report_2025-12-12.txt) for the results
+5. **View Report:** Check the generated file (e.g. `cleanup_report_2025-12-12.txt`) for the results
 
 ## ⚠️ Safety Mechanism
+
 By default, `DRY_RUN` is set to `True`. This ensures that **no resources are deleted** when you first run the script. The script will only print "Would delete..." to the console and the report.
 
 To enable actual deletion, change `DRY_RUN = False` in `config.py`.
 
 ## 🤝 Contribution
+
 Feel free to fork this project and submit pull requests for new features (e.g., Email reporting via SNS, Lambda support).
